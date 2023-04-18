@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhai+2&family=Ubuntu:wght@300&display=swap" rel="stylesheet">
+    <title>Funny Chatgpt</title>
+</head>
+<body>
+<div class="container">
+    <h2>Welcome to Login Page</h2>
+    <form class="login">
+        <div class="emailArea">
+        <label for="email">Email: </label>
+        <input type="text" name="email" id="email" placeholder="Enter your Email">
+        </div>
+        <div class="passwordArea">
+        <label for="password">Password: </label>
+        <input type="password" name="password" id="password" placeholder="Enter your password" value="Shiv@123">
+        </div>
+        <input class="submit" type="submit">
+        <div class="error"></div>
+    </form>
+</div>
+<script>
+    let data = localStorage.getItem(`user`)
+    data = JSON.parse(data)
+    // console.log(data)
+    const loginform = document.getElementsByClassName(`login`)[0]
+    const emailArea = document.getElementById(`email`)
+    const passwordArea = document.getElementById(`password`)
+    const error = document.getElementsByClassName(`error`)[0]
+    const cases = [`Email is not valid` , `Password is incorrect`,`Login Successfull`]
+
+// Checking the user entered valid credentials
+
+    let  checkLogin=(email,password)=>{
+        let flag = 0
+        for(let t of data){
+        if(t.email==email){
+            if(t.password==password){
+                return 2
+            }
+            else{
+                return 1
+            }
+            flag = 1
+        }
+        else if(flag==0){
+            return 0
+        }
+        }
+    }
+
+    //generating the token for the user
+
+    function genToken(){
+        const capital = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+        const small = `abcdefghijklmnopqrstuvwxyz`
+        const num = `1234567890`
+        const special = `!~@#$%^&*()_+=-?/`
+
+        const letters = capital+small+num+special
+        let token = ``
+        for(let i=0;i<15;i++){
+            let random = Math.floor(Math.random()*letters.length)
+            token = token+letters[random]
+        }
+       return token
+    }
+
+    let login=(e)=>{
+        e.preventDefault()
+        const email = emailArea.value
+        const password = passwordArea.value
+        let result = checkLogin(email,password)
+        if(!email || !password){
+        error.innerHTML = `<p>Please fill all the fields</p>`
+        error.style.cssText = `color:red; text-align:center;`
+        }
+        else if(result==0||result==1){
+        error.innerHTML = cases[result]
+        error.style.cssText = `color:red; text-align:center;`
+        }
+        else if(result==2){
+        error.innerHTML = cases[result]
+        error.style.cssText = `color:green; text-align:center;`
+        let token = genToken()
+        // console.log(data)
+        setTimeout(()=>{
+            window.location.href = `../funnychatgpt/Home.html`
+        },1000)
+            
+        let flag=0
+        for(let t of data){
+            if(t.token==token){
+                flag=1
+            }
+        }
+        if(flag==1){
+            genToken()
+        }
+        else if(flag==0){
+            for(let t of data){
+                if(t.email==email){
+                    t.token = token
+                }
+            }
+        }
+        // console.log(data)
+        data = JSON.stringify(data)
+          localStorage.setItem(`user`,data)
+        }
+        }
+
+
+    loginform.addEventListener(`submit` , login)
+</script>
+</body>
+</html>

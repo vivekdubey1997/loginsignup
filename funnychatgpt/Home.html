@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            background-color: darkblue;
+            color: white;
+        }
+        h2{
+            text-align: center;
+            color: #600760;
+        }
+        .container{
+            height: 610px;
+            width: 400px;
+            border: 1px solid black;
+            background-color: rgb(82, 182, 105);
+            margin: 50px auto;
+        }
+        .container textarea{
+            display: block;
+            margin: 10px auto;
+        }
+        .container button{
+            display: block;
+            margin: -5px auto; 
+            width: 150px;
+            height:35px;
+            border-radius: 15px;
+            font-size: 18px;
+            background-color: rgb(214, 77, 27);
+            border: none;
+            font-weight: bold;
+            color: white;
+        }
+        button:hover{
+            color: black;
+            background-color: rgb(26, 156, 211);
+        }
+        .display{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 10px;
+        }
+        img{
+            max-width: 210px;
+            margin: 10px;
+        }
+        .speechText{
+            text-align: center;
+        }
+        .hide{
+            display: none;
+        }
+        .error{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome to the ChatGPT Prototype</h2>
+    <textarea name="question" id="question" cols="40" rows="8"></textarea><br>
+    <button id="submit">Submit</button>
+    <div class="display"></div>
+    <div class="speechText hide">
+        <form id="speechForm">
+        <input type="text" id="speech" name="speech" placeholder="Enter your token">
+        <input type="submit" value="Submit">
+        </form>
+    </div>
+    <div class="error"></div>
+    </div>
+
+    <script>
+        let data = localStorage.getItem(`user`)
+        data = JSON.parse(data)
+
+        const questionArea = document.getElementById(`question`)
+        const submit = document.getElementById(`submit`)
+        const display = document.getElementsByClassName(`display`)[0]
+        const speechText = document.getElementsByClassName(`speechText`)[0]
+        const speechForm = document.getElementById(`speechForm`)
+        let questionBank = [
+         {question: "what is a dog" , answer: "Dog is a animal with 4 legs", imageLink: "./dog.jpeg"},
+         {question: "what is a cat" , answer: "Cat is a animal with 4 legs", imageLink: "./cat.jpeg"},
+         {question: "what is a laptop" , answer: "Laptop is a machine", imageLink: "./laptop.jpeg"},
+        ]
+
+        let findAns = (e)=>{
+            e.preventDefault()
+            display.innerHTML = ``
+            let question = questionArea.value
+            question = question.toLowerCase()
+            for(let t of questionBank){
+                if(t.question==question){
+                   let para = document.createElement(`p`)
+                   para.innerHTML = t.answer
+                   para.setAttribute(`class`,`answer`)
+                   para.style.fontSize = `20px`
+                   display.appendChild(para)
+                   let img = document.createElement(`img`)
+                   img.src = t.imageLink
+                   display.appendChild(img)
+                //    speechText.removeAttribute(`class`,`hide`)
+                   speechText.classList.remove(`hide`)
+                   console.log(data)
+                    speechForm.addEventListener(`submit`, heySiri)
+                }
+            }
+            questionArea.value=``
+        }
+
+        function heySiri(e){
+            e.preventDefault()
+            let answer = document.getElementsByClassName(`answer`)[0]
+            let token = document.getElementById(`speech`).value
+            let error = document.getElementsByClassName(`error`)[0]
+            error.innerHTML = ``
+            let flag=0
+            for(let t of data){
+                if(t.token == token){
+            let siri = new SpeechSynthesisUtterance()
+            siri.lang = `en-US`
+            siri.volume = `0.7`
+            siri.text = answer.innerHTML
+                    flag=1
+            speechSynthesis.speak(siri)
+                }
+            }
+            if(flag==0){
+                error.innerHTML = `Token is not Valid`
+                error.style.color = `red`
+            }
+        }
+        submit.addEventListener(`click` , findAns)
+    </script>
+</body>
+</html>
